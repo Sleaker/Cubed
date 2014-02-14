@@ -50,34 +50,36 @@ public class NaiveMesher extends VoxelMesher {
                 // Loop over all 6 faces and verify which one should be visible as we currently don't cache this value
                 for (Face face : Face.values()) {
                     if (terrain.isFaceVisible(tmpI, face)) {
+                        // Write the verts
                         switch (face) {
                             case TOP:
-                                writeQuad(verts, textCoords, indices, normals, 
-                                        faceLoc_rearTopLeft, faceLoc_rearTopRight, faceLoc_frontTopLeft, faceLoc_frontTopRight, 1, 1, face, skin);
+                                writeQuad(verts, indices, normals, 
+                                        faceLoc_rearTopLeft, faceLoc_rearTopRight, faceLoc_frontTopLeft, faceLoc_frontTopRight, face);
                                 break;
                             case BOTTOM:
-                                 writeQuad(verts, textCoords, indices, normals,
-                                        faceLoc_rearBotRight, faceLoc_rearBotLeft, faceLoc_frontBotRight, faceLoc_frontBotLeft, 1, 1, face, skin);
+                                 writeQuad(verts, indices, normals,
+                                        faceLoc_rearBotRight, faceLoc_rearBotLeft, faceLoc_frontBotRight, faceLoc_frontBotLeft, face);
                                 break;
                             case LEFT:
-                                writeQuad(verts, textCoords, indices, normals, 
-                                        faceLoc_frontBotLeft, faceLoc_rearBotLeft, faceLoc_frontTopLeft, faceLoc_rearTopLeft, 1, 1, face, skin);
+                                writeQuad(verts, indices, normals, 
+                                        faceLoc_frontBotLeft, faceLoc_rearBotLeft, faceLoc_frontTopLeft, faceLoc_rearTopLeft, face);
                                 break;
                             case RIGHT:
-                                writeQuad(verts, textCoords, indices, normals, 
-                                        faceLoc_rearBotRight, faceLoc_frontBotRight, faceLoc_rearTopRight, faceLoc_frontTopRight, 1, 1, face, skin);
+                                writeQuad(verts, indices, normals, 
+                                        faceLoc_rearBotRight, faceLoc_frontBotRight, faceLoc_rearTopRight, faceLoc_frontTopRight, face);
                                 break;
                             case FRONT:
-                                writeQuad(verts, textCoords, indices, normals, 
-                                        faceLoc_rearBotLeft, faceLoc_rearBotRight, faceLoc_rearTopLeft, faceLoc_rearTopRight, 1, 1, face, skin);
+                                writeQuad(verts, indices, normals, 
+                                        faceLoc_rearBotLeft, faceLoc_rearBotRight, faceLoc_rearTopLeft, faceLoc_rearTopRight, face);
                                 break;
                             case BACK:
-                                writeQuad(verts, textCoords, indices, normals, 
-                                        faceLoc_frontBotRight, faceLoc_frontBotLeft, faceLoc_frontTopRight, faceLoc_frontTopLeft, 1, 1, face, skin);
+                                writeQuad(verts, indices, normals, 
+                                        faceLoc_frontBotRight, faceLoc_frontBotLeft, faceLoc_frontTopRight, faceLoc_frontTopLeft, face);
                                 break;
-                            default:
-                                
+                            default:       
                         }
+                        // Write the texture coords
+                        this.writeTextureCoords(textCoords, terrain, tmpI, face, 1, 1, skin);
                     }
                 }
             }

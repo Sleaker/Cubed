@@ -4,6 +4,7 @@ import com.jme3.cubed.BlockSkin;
 import com.jme3.cubed.ChunkTerrain;
 import com.jme3.cubed.Face;
 import com.jme3.cubed.math.Vector2i;
+import com.jme3.cubed.math.Vector3i;
 import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
@@ -30,11 +31,13 @@ public abstract class VoxelMesher {
             indices[i] = indicesList.get(i);
         }
         mesh.setBuffer(VertexBuffer.Type.Index, 1, BufferUtils.createIntBuffer(indices));
-        float[] normals = new float[normalsList.size()];
-        for (int i = 0; i < normals.length; i++) {
-            normals[i] = normalsList.get(i);
+        if (normalsList != null) {
+            float[] normals = new float[normalsList.size()];
+            for (int i = 0; i < normals.length; i++) {
+                normals[i] = normalsList.get(i);
+            }
+            mesh.setBuffer(VertexBuffer.Type.Normal, 3, BufferUtils.createFloatBuffer(normals));
         }
-        mesh.setBuffer(VertexBuffer.Type.Normal, 3, BufferUtils.createFloatBuffer(normals));
         mesh.updateBound();
         mesh.setStatic();
         return mesh;
@@ -55,8 +58,8 @@ public abstract class VoxelMesher {
      * @param face
      * @param skin 
      */
-    protected void writeQuad(ArrayList<Vector3f> verts, ArrayList<Vector2f> textureCoords, ArrayList<Integer> indices, ArrayList<Float> normals,
-            Vector3f bottomLeft, Vector3f topLeft, Vector3f topRight, Vector3f bottomRight, int width, int height, Face face, BlockSkin skin) {
+    protected void writeQuad(ArrayList<Vector3f> verts, ArrayList<Integer> indices, ArrayList<Float> normals,
+            Vector3f bottomLeft, Vector3f topLeft, Vector3f topRight, Vector3f bottomRight, Face face) {
         //System.out.println("BL: " + bottomLeft + " BR: " + bottomRight + " TL: " + topLeft + " TR: " + topRight);
         // Get current vertex count, and add indices to the index list
         int vertCount = verts.size();
@@ -66,7 +69,7 @@ public abstract class VoxelMesher {
         indices.add(vertCount + 1);
         indices.add(vertCount + 3);
         indices.add(vertCount + 2);
-        
+
         // add the face normals
         normals.addAll(face.getNormals());
         
@@ -76,10 +79,13 @@ public abstract class VoxelMesher {
         verts.add(topRight);
         verts.add(bottomRight);
         
-        // add texture locations from skin - need to adjust for width/height
-        addBlockTextureCoordinates(textureCoords, skin.getTextureLocation(face), width, height);
+        
     }
     
+    protected void writeTextureCoords(ArrayList<Vector2f> textureCoords, ChunkTerrain terrain, Vector3i blockLoc, Face face, int width, int height, BlockSkin skin) {
+        // add texture locations from skin - need to adjust for width/height
+        addBlockTextureCoordinates(textureCoords, skin.getTextureLocation(terrain, blockLoc, face), width, height);
+    }
         
     private static void addBlockTextureCoordinates(ArrayList<Vector2f> textureCoordinatesList, Vector2i textureLoc, int width, int height){
         textureCoordinatesList.add(getTextureCoordinates(textureLoc, 0, 0));

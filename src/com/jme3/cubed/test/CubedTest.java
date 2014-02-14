@@ -12,7 +12,9 @@ import com.jme3.cubed.Face;
 import com.jme3.cubed.MaterialManager;
 import com.jme3.cubed.math.Vector2i;
 import com.jme3.cubed.math.Vector3i;
+import com.jme3.cubed.noise.Simplex;
 import com.jme3.cubed.render.GreedyMesher;
+import com.jme3.cubed.render.MarchingCubesMesher;
 import com.jme3.cubed.render.NaiveMesher;
 import com.jme3.cubed.render.VoxelMesher;
 import com.jme3.cubed.test.blocks.Block_Brick;
@@ -37,33 +39,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class CubedTest extends SimpleApplication{
+public class CubedTest extends SimpleApplication {
 
+    // Random seed value, adjust this to try different test terrain
+    private static final int DEFAULT_SEED = 124124;
     private MaterialManager mm;
     private BlockMaterial bm;
     private boolean wireframe = false;
     ChunkTerrainControl ctc;
-    ArrayList<VoxelMesher> meshers = new ArrayList<>(Arrays.asList(new NaiveMesher(), new GreedyMesher()));
+    ArrayList<VoxelMesher> meshers = new ArrayList<>(Arrays.asList(new NaiveMesher(), new GreedyMesher(), new MarchingCubesMesher()));
     private int currentMesh = 0;
-    
-    public static void main(String[] args){
+
+    public static void main(String[] args) {
         Logger.getLogger("").setLevel(Level.SEVERE);
         CubedTest app = new CubedTest();
         app.start();
     }
 
-    public CubedTest(){
+    public CubedTest() {
         settings = new AppSettings(true);
         settings.setWidth(1280);
         settings.setHeight(720);
         settings.setTitle("Cubes Test");
     }
-
     /**
      * ActionListener that swaps between wireframe and rendering modes
      */
     private ActionListener actionListener = new ActionListener() {
-
         @Override
         public void onAction(String name, boolean isPressed, float tpf) {
             if (name.equals("toggle wireframe") && !isPressed) {
@@ -80,7 +82,7 @@ public class CubedTest extends SimpleApplication{
     };
 
     @Override
-    public void simpleInitApp(){
+    public void simpleInitApp() {
         this.stateManager.attach(new ScreenshotAppState());
         bm = new BlockMaterial(this.getAssetManager(), "Textures/cubes/terrain.png");
         bm.getAdditionalRenderState().setWireframe(wireframe);
@@ -99,78 +101,103 @@ public class CubedTest extends SimpleApplication{
         terrainNode.addControl(ctc);
         terrainNode.setShadowMode(RenderQueue.ShadowMode.CastAndReceive);
         this.rootNode.attachChild(terrainNode);
-        
+
         // TODO: finish fixing noise.
-        //FractalNoise noise = new FractalNoise(null, 24.4f, 160, 160, 18);
-        Vector3i point = new Vector3i();
-        for (int x = 0; x < 160; x++) {
-            point.setX(x);
-            for (int y = 0; y < ChunkTerrain.C_SIZE; y++) {
-                point.setY(y);
-                for (int z = 0; z < 160; z++) {
-                    point.setZ(z);
-                    //ctc.setBlock(noise.getBlockAtPoint(point), point, true);
-                }
-            }
-        }
-        
-        ctc.setBlock(Block_Stone.class, Vector3i.ZERO, true);
-        ctc.setBlock(Block_Water.class, Vector3i.UNIT_Y, true);
+        this.genTerrainFromNoise(ctc);
+
+        //ctc.setBlock(Block_Stone.class, Vector3i.ZERO, true);
+        //ctc.setBlock(Block_Water.class, Vector3i.UNIT_Y, true);
 
         cam.setLocation(new Vector3f(-10, 10, 16));
         cam.lookAtDirection(new Vector3f(1, -0.56f, -1), Vector3f.UNIT_Y);
         flyCam.setMoveSpeed(50);
     }
-    
+
     private void initTestBlocks() {
-        mm.register(Block_Grass.class, new BlockSkin(new Vector2i[] { 
-            new Vector2i(0, 0), new Vector2i(1, 0), new Vector2i(2, 0) }, false) {
-
+        mm.register(Block_Grass.class, new BlockSkin(new Vector2i[]{
+            new Vector2i(0, 0), new Vector2i(1, 0), new Vector2i(2, 0)}, false) {
             @Override
-            protected int getTextureLocationIndex(Face face) {
-                switch(face) {
-                    case TOP:
-                        return 0;
+            protected int getTextureLocationIndex(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
+                if (terrain.isFaceVisible(blockLoc, Face.TOP)) {
+                    switch (face) {
+                        case TOP:
+                            return 0;
 
-                    case BOTTOM:
-                        return 2;
+                        case BOTTOM:
+                            return 2;
+                    }
+                    return 1;
                 }
-                return 1;
+                return 2;
             }
         });
         mm.register(Block_Stone.class, new BlockSkin(new Vector2i(9, 0), false));
         mm.register(Block_Water.class, new BlockSkin(new Vector2i(0, 1), true));
         mm.register(Block_Brick.class, new BlockSkin(new Vector2i(11, 0), false));
     }
-    
+
     private void setupLighting() {
         DirectionalLight directionalLight = new DirectionalLight();
         directionalLight.setDirection(new Vector3f(-0.8f, -1, -0.8f).normalizeLocal());
         directionalLight.setColor(new ColorRGBA(1f, 1f, 1f, 1.0f));
         getRootNode().addLight(directionalLight);
         getRootNode().attachChild(SkyFactory.createSky(getAssetManager(), "Textures/cubes/sky.jpg", true));
-        
+
         DirectionalLightShadowRenderer directionalLightShadowRenderer = new DirectionalLightShadowRenderer(getAssetManager(), 2048, 3);
         directionalLightShadowRenderer.setLight(directionalLight);
         directionalLightShadowRenderer.setShadowIntensity(0.3f);
         getViewPort().addProcessor(directionalLightShadowRenderer);
     }
-    
+
     public void initializeWater() {
         WaterFilter waterFilter = new WaterFilter(getRootNode(), new Vector3f(-0.8f, -1, -0.8f).normalizeLocal());
         getFilterPostProcessor(this).addFilter(waterFilter);
     }
-    
-    private static FilterPostProcessor getFilterPostProcessor(SimpleApplication simpleApplication){
+
+    private static FilterPostProcessor getFilterPostProcessor(SimpleApplication simpleApplication) {
         List<SceneProcessor> sceneProcessors = simpleApplication.getViewPort().getProcessors();
-        for(int i=0;i<sceneProcessors.size();i++){
+        for (int i = 0; i < sceneProcessors.size(); i++) {
             SceneProcessor sceneProcessor = sceneProcessors.get(i);
-            if(sceneProcessor instanceof FilterPostProcessor){
+            if (sceneProcessor instanceof FilterPostProcessor) {
                 return (FilterPostProcessor) sceneProcessor;
             }
         }
         FilterPostProcessor filterPostProcessor = new FilterPostProcessor(simpleApplication.getAssetManager());
         simpleApplication.getViewPort().addProcessor(filterPostProcessor);
         return filterPostProcessor;
+    }
+
+    private void genTerrainFromNoise(ChunkTerrainControl ctc) {
+        Simplex noise = new Simplex(150);
+        Simplex noise2 = new Simplex(150 + 250);
+        Vector3i point = new Vector3i();
+        for (int x = 0; x < 160; x++) {
+            point.setX(x);
+            for (int z = 0; z < 160; z++) {
+                int landHeight = (int) (Math.floor(noise.getValue(x, 0, z) * 5 + 10));
+                landHeight += (int) (Math.floor(noise.getValue(x, 0, z) * 3));
+                int dirtHeight = (int) (Math.floor((hash(x, z) >> 8 & 0xf) / 15f * 3) + 1);
+                point.setZ(z);
+                for (int y = 0; y < 64; y++) {
+                    point.setY(y);
+                    if (y == 0) {
+                        ctc.setBlock(Block_Stone.class, point, true);
+                    } else if (y > landHeight)
+                            continue;
+                    if (y == landHeight) {
+                        ctc.setBlock(Block_Grass.class, point, true);
+                    } else if (y >= landHeight - dirtHeight) {
+                        ctc.setBlock(Block_Grass.class, point, true);
+                    } else {
+                        ctc.setBlock(Block_Stone.class, point, true);
+                    }
+                }
+            }
+        }
+    }
+
+    private static int hash(int x, int y) {
+        int hash = x * 3422543 ^ y * 432959;
+        return hash * hash * (hash + 324319);
     }
 }

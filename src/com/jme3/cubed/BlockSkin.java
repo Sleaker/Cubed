@@ -1,6 +1,7 @@
 package com.jme3.cubed;
 
 import com.jme3.cubed.math.Vector2i;
+import com.jme3.cubed.math.Vector3i;
 
 public class BlockSkin {
     private Vector2i[] textureLocations;
@@ -15,11 +16,11 @@ public class BlockSkin {
         this.isTransparent = isTransparent;
     }
     
-    public Vector2i getTextureLocation(Face face) {
-        return textureLocations[getTextureLocationIndex(face)];
+    public Vector2i getTextureLocation(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
+        return textureLocations[getTextureLocationIndex(terrain, blockLoc, face)];
     }
 
-    protected int getTextureLocationIndex(Face face) {
+    protected int getTextureLocationIndex(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
         if(textureLocations.length == 6) {
             return face.ordinal();
         }
