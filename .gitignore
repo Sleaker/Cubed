@@ -1,0 +1,9 @@
+build/
+nbproject/
+.project
+MANIFEST.MF
+master-application.jnlp
+lwjgl64.dll
+OpenAL64.dll
+.classpath
+build.xml
