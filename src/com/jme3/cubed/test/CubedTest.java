@@ -12,7 +12,6 @@ import com.jme3.cubed.Face;
 import com.jme3.cubed.MaterialManager;
 import com.jme3.cubed.math.Vector2i;
 import com.jme3.cubed.math.Vector3i;
-import com.jme3.cubed.noise.Simplex;
 import com.jme3.cubed.render.GreedyMesher;
 import com.jme3.cubed.render.MarchingCubesMesher;
 import com.jme3.cubed.render.NaiveMesher;
@@ -38,6 +37,8 @@ import com.jme3.water.WaterFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import net.jlibnoise.NoiseQuality;
+import net.jlibnoise.module.source.Perlin;
 
 public class CubedTest extends SimpleApplication {
 
@@ -108,7 +109,7 @@ public class CubedTest extends SimpleApplication {
         //ctc.setBlock(Block_Stone.class, Vector3i.ZERO, true);
         //ctc.setBlock(Block_Water.class, Vector3i.UNIT_Y, true);
 
-        cam.setLocation(new Vector3f(-10, 10, 16));
+        cam.setLocation(new Vector3f(-10, 64, 16));
         cam.lookAtDirection(new Vector3f(1, -0.56f, -1), Vector3f.UNIT_Y);
         flyCam.setMoveSpeed(50);
     }
@@ -168,14 +169,18 @@ public class CubedTest extends SimpleApplication {
     }
 
     private void genTerrainFromNoise(ChunkTerrainControl ctc) {
-        Simplex noise = new Simplex(150);
-        Simplex noise2 = new Simplex(150 + 250);
+        Perlin noise = new Perlin();
+        noise.setFrequency(0.01);
+        noise.setLacunarity(2.0);
+        noise.setNoiseQuality(NoiseQuality.BEST);
+        noise.setOctaveCount(8);
+        noise.setPersistence(0.5);
+        noise.setSeed(DEFAULT_SEED);
         Vector3i point = new Vector3i();
-        for (int x = 0; x < 160; x++) {
+        for (int x = -160; x < 160; x++) {
             point.setX(x);
-            for (int z = 0; z < 160; z++) {
-                int landHeight = (int) (Math.floor(noise.getValue(x, 0, z) * 5 + 10));
-                landHeight += (int) (Math.floor(noise.getValue(x, 0, z) * 3));
+            for (int z = -160; z < 160; z++) {
+                int landHeight = (int) (Math.floor(noise.getValue(x, 0, z) * 20 + 20));
                 int dirtHeight = (int) (Math.floor((hash(x, z) >> 8 & 0xf) / 15f * 3) + 1);
                 point.setZ(z);
                 for (int y = 0; y < 64; y++) {

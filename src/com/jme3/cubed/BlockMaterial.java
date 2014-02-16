@@ -11,11 +11,12 @@ import com.jme3.texture.Texture;
  */
 public class BlockMaterial extends Material {
 
-    public BlockMaterial(AssetManager assetManager, String blockTextureFilePath){
+    public BlockMaterial(AssetManager assetManager, String texturePath){
         super(assetManager, "Common/MatDefs/Misc/Unshaded.j3md");
-        Texture texture = assetManager.loadTexture(blockTextureFilePath);
+        
+        Texture texture = assetManager.loadTexture(texturePath);
         texture.setMagFilter(Texture.MagFilter.Nearest);
-        texture.setMinFilter(Texture.MinFilter.NearestNoMipMaps);
+        texture.setMinFilter(Texture.MinFilter.NearestNearestMipMap);
         setTexture("ColorMap", texture);
         getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
     }

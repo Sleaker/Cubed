@@ -16,8 +16,6 @@ import java.util.ArrayList;
  *
  * @author Nicholas Minkler <sleaker@gmail.com>
  */
-
-
 public abstract class VoxelMesher {
     public abstract Mesh generateMesh(ChunkTerrain terrain);
     

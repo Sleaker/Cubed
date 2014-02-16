@@ -54,7 +54,7 @@ public class ChunkTerrainControl extends AbstractControl {
                 return;
             }
         }
-        terrain.setBlock(blockClass, new Vector3i(loc.getX() & ChunkTerrain.MASK, loc.getY() & ChunkTerrain.MASK, loc.getZ() & ChunkTerrain.MASK));
+        terrain.setBlock(blockClass, loc.getX() & ChunkTerrain.MASK, loc.getY() & ChunkTerrain.MASK, loc.getZ() & ChunkTerrain.MASK);
     }
     
     public BlockMaterial getMaterial() {
@@ -64,7 +64,7 @@ public class ChunkTerrainControl extends AbstractControl {
     /**
      * Gets a ChunkTerrain from the given chunk vector
      * @param vec
-     * @return 
+     * @return chunk
      */
     public ChunkTerrain getTerrain(Vector3i vec) {
         return chunks.get(vec);

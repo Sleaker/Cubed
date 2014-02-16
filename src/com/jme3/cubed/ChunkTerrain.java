@@ -76,6 +76,17 @@ public class ChunkTerrain extends Node {
         return blocks;
     }
 
+    public void setBlock(Class<? extends Block> blockClass, int x, int y, int z) {
+        if (isInChunk(x, y, z)) {
+            if (blockClass == null) {
+                blocks[(x << X_SHIFT) + z + (y << Y_SHIFT)] = 0;
+            } else {
+                blocks[(x << X_SHIFT) + z + (y << Y_SHIFT)] = MaterialManager.getInstance().getType(blockClass).getType();
+            }
+            needsMeshUpdate = true;
+        } 
+    }
+
     public void setBlock(Class<? extends Block> blockClass, Vector3i loc) {
         int x = loc.getX();
         int y = loc.getY();
@@ -90,20 +101,21 @@ public class ChunkTerrain extends Node {
         }
     }
     
-    public byte getBlock(Vector3i loc) {
-        int x = loc.getX();
-        int y = loc.getY();
-        int z = loc.getZ();
-        if (isInChunk(loc)) {
+    public byte getBlock(int x, int y, int z) {
+        if (isInChunk(x, y, z)) {
             return blocks[(x << X_SHIFT) + z + (y << Y_SHIFT)];
         } else {
             return 0;
         }
     }
     
+    public byte getBlock(Vector3i loc) {
+        return getBlock(loc.getX(), loc.getY(), loc.getZ());
+    }
+    
     public boolean isFaceVisible(Vector3i loc, Face face) {
         Vector3i vec = loc.add(face.getOffsetVector());
-        byte type = 0;
+        byte type;
         if (!isInChunk(vec)) {
             type = chunkControl.getBlock(vec.add(blockLocation));
         } else {
@@ -112,8 +124,12 @@ public class ChunkTerrain extends Node {
         return type == 0 || MaterialManager.getInstance().getType(type).getSkin().isTransparent();
     }
     
+    private boolean isInChunk(int x, int y, int z) {
+        return x < C_SIZE && y < C_SIZE && z < C_SIZE && x > -1 && y > -1 && z > -1;
+    }
+
     private boolean isInChunk(Vector3i vec) {
-     return vec.getX() < C_SIZE && vec.getY() < C_SIZE && vec.getZ() < C_SIZE && vec.getX() > -1 && vec.getY() > -1 && vec.getZ() > -1;   
+     return isInChunk(vec.getX(), vec.getY(), vec.getZ());  
     }
 
     public Vector3i getLocation() {
