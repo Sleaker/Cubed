@@ -1,33 +1,44 @@
 package com.jme3.cubed;
 
-import com.jme3.cubed.math.Vector2i;
 import com.jme3.cubed.math.Vector3i;
 
 public class BlockSkin {
-    private Vector2i[] textureLocations;
-    private boolean isTransparent;
+    private int textureOffset = 0;
+    private final String[] textureImages;
+    private final boolean isTransparent;
     
-    public BlockSkin(Vector2i textureLocation, boolean isTransparent) {
-        this(new Vector2i[] { textureLocation }, isTransparent);
-    }
-    
-    public BlockSkin(Vector2i[] textureLocations, boolean isTransparent) {
-        this.textureLocations = textureLocations;
+    public BlockSkin(boolean isTransparent, String ... textureImages) {
         this.isTransparent = isTransparent;
+        this.textureImages = textureImages;
     }
     
-    public Vector2i getTextureLocation(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
-        return textureLocations[getTextureLocationIndex(terrain, blockLoc, face)];
-    }
-
-    protected int getTextureLocationIndex(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
-        if(textureLocations.length == 6) {
-            return face.ordinal();
+    /**
+     * Gets the texture offset for this Skin. This is the location in the TextureArray where the Block texture is located
+     * @param terrain
+     * @param blockLoc
+     * @param face
+     * @return int texture offset
+     */
+    public int getTextureOffset(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
+        if(textureImages.length == 6) {
+            return face.ordinal() + textureOffset;
         }
-        return 0;
+        return textureOffset;
     }
 
     public boolean isTransparent(){
         return isTransparent;
+    }
+    
+    /**
+     * Set this skin's offset value for textures in the TextureArray
+     * @param offset 
+     */
+    public void setTextureOffset(int offset) {
+        this.textureOffset = offset;
+    }
+    
+    public String[] getTextureImages() {
+        return textureImages;
     }
 }

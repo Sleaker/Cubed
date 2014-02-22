@@ -1,8 +1,10 @@
 package com.jme3.cubed;
 
 import com.jme3.cubed.math.Vector3i;
+import com.jme3.export.InputCapsule;
 import com.jme3.export.JmeExporter;
 import com.jme3.export.JmeImporter;
+import com.jme3.export.OutputCapsule;
 import com.jme3.scene.Geometry;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.Node;
@@ -52,9 +54,13 @@ public class ChunkTerrain extends Node {
         this.location = new Vector3i(x, y, z);
         this.blockLocation = location.mult(C_SIZE);
         this.blocks = new byte[1 << (C_BITS * 3)];
-        this.setLocalTranslation(location.toVector3f().mult(C_SIZE));
+        this.setLocalTranslation(blockLocation.toVector3f());
     }
     
+    public ChunkTerrainControl getChunkControl() {
+        return chunkControl;
+    }
+
     protected void update(float tpf) {
         if (needsMeshUpdate) {
             if (meshData == null) {
@@ -141,12 +147,22 @@ public class ChunkTerrain extends Node {
     }
     
     @Override
-    public void write(JmeExporter e) throws IOException {
-        super.write(e);
+    public void write(JmeExporter ex) throws IOException {
+        super.write(ex);        
+        OutputCapsule oc = ex.getCapsule(this);
+        oc.write(location, "location", Vector3i.ZERO);
+        oc.write(blocks, "blocks", new byte[1 << (C_BITS * 3)]);
+        
     }
 
     @Override
-    public void read(JmeImporter e) throws IOException {
-        super.read(e);
+    public void read(JmeImporter in) throws IOException {
+        super.read(in);
+        InputCapsule ic = in.getCapsule(this);
+        this.location = (Vector3i) ic.readSavable("location", Vector3i.ZERO);
+        this.blockLocation = location.mult(C_SIZE);
+        this.blocks = ic.readByteArray("blocks", new byte[1 << (C_BITS * 3)]);
+        this.setLocalTranslation(blockLocation.toVector3f());
+        this.needsMeshUpdate = true;
     }
 }

@@ -2,10 +2,10 @@ package com.jme3.cubed.render;
 
 import com.jme3.cubed.BlockSkin;
 import com.jme3.cubed.ChunkTerrain;
+import com.jme3.cubed.ChunkTerrainControl;
 import com.jme3.cubed.Face;
 import com.jme3.cubed.math.Vector2i;
 import com.jme3.cubed.math.Vector3i;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import com.jme3.scene.VertexBuffer;
@@ -19,11 +19,11 @@ import java.util.ArrayList;
 public abstract class VoxelMesher {
     public abstract Mesh generateMesh(ChunkTerrain terrain);
     
-    protected Mesh genMesh(ArrayList<Vector3f> vertexList, ArrayList<Vector2f> textCoordsList, ArrayList<Integer> indicesList, ArrayList<Float> normalsList) {
+    protected Mesh genMesh(ArrayList<Vector3f> vertexList, ArrayList<Vector3f> textCoordsList, ArrayList<Integer> indicesList, ArrayList<Float> normalsList) {
         // Dump all of the Data into buffers on a Mesh
         Mesh mesh = new Mesh();
         mesh.setBuffer(VertexBuffer.Type.Position, 3, BufferUtils.createFloatBuffer(vertexList.toArray(new Vector3f[vertexList.size()])));
-        mesh.setBuffer(VertexBuffer.Type.TexCoord, 2, BufferUtils.createFloatBuffer(textCoordsList.toArray(new Vector2f[textCoordsList.size()])));
+        mesh.setBuffer(VertexBuffer.Type.TexCoord, 3, BufferUtils.createFloatBuffer(textCoordsList.toArray(new Vector3f[textCoordsList.size()])));
         int[] indices = new int[indicesList.size()];
         for (int i = 0; i < indices.length; i++) {
             indices[i] = indicesList.get(i);
@@ -80,23 +80,15 @@ public abstract class VoxelMesher {
         
     }
     
-    protected void writeTextureCoords(ArrayList<Vector2f> textureCoords, ChunkTerrain terrain, Vector3i blockLoc, Face face, int width, int height, BlockSkin skin) {
-        // add texture locations from skin - need to adjust for width/height
-        addBlockTextureCoordinates(textureCoords, skin.getTextureLocation(terrain, blockLoc, face), width, height);
-    }
-        
-    private static void addBlockTextureCoordinates(ArrayList<Vector2f> textureCoordinatesList, Vector2i textureLoc, int width, int height){
-        textureCoordinatesList.add(getTextureCoordinates(textureLoc, 0, 0));
-        textureCoordinatesList.add(getTextureCoordinates(textureLoc, width, 0));
-        textureCoordinatesList.add(getTextureCoordinates(textureLoc, 0, height));
-        textureCoordinatesList.add(getTextureCoordinates(textureLoc, width, height));
+    protected void writeTextureCoords(ArrayList<Vector3f> textureCoords, ChunkTerrain terrain, Vector3i blockLoc, Face face, int width, int height, BlockSkin skin) {
+        Vector2i textSize = terrain.getChunkControl().getMaterial().getTextWH();
+        addBlockTextureCoordinates(textureCoords, textSize, skin.getTextureOffset(terrain, blockLoc, face), width, height);
     }
 
-    private static Vector2f getTextureCoordinates(Vector2i textureLoc, int xUnitsToAdd, int yUnitsToAdd){
-        float textureCount = 16;
-        float textureUnit = 1.0f / textureCount;
-        float x = (((textureLoc.getX() + xUnitsToAdd) * textureUnit));
-        float y = ((((-1 * textureLoc.getY()) + (yUnitsToAdd - 1)) * textureUnit) + 1);
-        return new Vector2f(x, y);
+    private static void addBlockTextureCoordinates(ArrayList<Vector3f> textureCoordinatesList, Vector2i textSize, int textureLoc, int width, int height){
+        textureCoordinatesList.add(new Vector3f(textSize.getX(), textSize.getY(), textureLoc));
+        textureCoordinatesList.add(new Vector3f(textSize.getX() + width, textSize.getY(), textureLoc));
+        textureCoordinatesList.add(new Vector3f(textSize.getX(), textSize.getY() + height, textureLoc));
+        textureCoordinatesList.add(new Vector3f(textSize.getX() + width, textSize.getY() + height, textureLoc));
     }
 }

@@ -16,7 +16,7 @@ public class MarchingCubesMesher extends VoxelMesher {
     @Override
     public Mesh generateMesh(ChunkTerrain terrain) {
         ArrayList<Vector3f> verts = new ArrayList<>();
-        ArrayList<Vector2f> textCoords = new ArrayList<>();
+        ArrayList<Vector3f> textCoords = new ArrayList<>();
         ArrayList<Integer> indices = new ArrayList<>();
         //ArrayList<Float> normals = new ArrayList<>();
 

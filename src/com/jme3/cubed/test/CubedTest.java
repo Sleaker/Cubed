@@ -17,6 +17,7 @@ import com.jme3.cubed.render.MarchingCubesMesher;
 import com.jme3.cubed.render.NaiveMesher;
 import com.jme3.cubed.render.VoxelMesher;
 import com.jme3.cubed.test.blocks.Block_Brick;
+import com.jme3.cubed.test.blocks.Block_Dirt;
 import com.jme3.cubed.test.blocks.Block_Grass;
 import com.jme3.cubed.test.blocks.Block_Stone;
 import com.jme3.cubed.test.blocks.Block_Water;
@@ -85,10 +86,12 @@ public class CubedTest extends SimpleApplication {
     @Override
     public void simpleInitApp() {
         this.stateManager.attach(new ScreenshotAppState());
-        bm = new BlockMaterial(this.getAssetManager(), "Textures/cubes/terrain.png");
-        bm.getAdditionalRenderState().setWireframe(wireframe);
         mm = MaterialManager.getInstance();
         initTestBlocks();
+        bm = new BlockMaterial(this.getAssetManager(), mm.getTexturePaths());
+        bm.getAdditionalRenderState().setWireframe(wireframe);
+        
+        
         //initializeWater();
         setupLighting();
         inputManager.addMapping("toggle wireframe", new KeyTrigger(KeyInput.KEY_T));
@@ -115,10 +118,9 @@ public class CubedTest extends SimpleApplication {
     }
 
     private void initTestBlocks() {
-        mm.register(Block_Grass.class, new BlockSkin(new Vector2i[]{
-            new Vector2i(0, 0), new Vector2i(1, 0), new Vector2i(2, 0)}, false) {
+        mm.register(Block_Grass.class, new BlockSkin(false, "Textures/cubes/grass_top.png", "Textures/cubes/grass_side.png", "Textures/cubes/dirt.png") {
             @Override
-            protected int getTextureLocationIndex(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
+            public int getTextureOffset(ChunkTerrain terrain, Vector3i blockLoc, Face face) {
                 if (terrain.isFaceVisible(blockLoc, Face.TOP)) {
                     switch (face) {
                         case TOP:
@@ -132,9 +134,10 @@ public class CubedTest extends SimpleApplication {
                 return 2;
             }
         });
-        mm.register(Block_Stone.class, new BlockSkin(new Vector2i(9, 0), false));
-        mm.register(Block_Water.class, new BlockSkin(new Vector2i(0, 1), true));
-        mm.register(Block_Brick.class, new BlockSkin(new Vector2i(11, 0), false));
+        mm.register(Block_Stone.class, new BlockSkin(false, "Textures/cubes/stone.png"));
+        mm.register(Block_Dirt.class, new BlockSkin(false, "Textures/cubes/dirt.png"));
+        //mm.register(Block_Water.class, new BlockSkin(true, ""));
+        //mm.register(Block_Brick.class, new BlockSkin(new Vector2i(11, 0), false));
     }
 
     private void setupLighting() {
@@ -192,7 +195,7 @@ public class CubedTest extends SimpleApplication {
                     if (y == landHeight) {
                         ctc.setBlock(Block_Grass.class, point, true);
                     } else if (y >= landHeight - dirtHeight) {
-                        ctc.setBlock(Block_Grass.class, point, true);
+                        ctc.setBlock(Block_Dirt.class, point, true);
                     } else {
                         ctc.setBlock(Block_Stone.class, point, true);
                     }
