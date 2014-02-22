@@ -81,14 +81,10 @@ public abstract class VoxelMesher {
     }
     
     protected void writeTextureCoords(ArrayList<Vector3f> textureCoords, ChunkTerrain terrain, Vector3i blockLoc, Face face, int width, int height, BlockSkin skin) {
-        Vector2i textSize = terrain.getChunkControl().getMaterial().getTextWH();
-        addBlockTextureCoordinates(textureCoords, textSize, skin.getTextureOffset(terrain, blockLoc, face), width, height);
-    }
-
-    private static void addBlockTextureCoordinates(ArrayList<Vector3f> textureCoordinatesList, Vector2i textSize, int textureLoc, int width, int height){
-        textureCoordinatesList.add(new Vector3f(textSize.getX(), textSize.getY(), textureLoc));
-        textureCoordinatesList.add(new Vector3f(textSize.getX() + width, textSize.getY(), textureLoc));
-        textureCoordinatesList.add(new Vector3f(textSize.getX(), textSize.getY() + height, textureLoc));
-        textureCoordinatesList.add(new Vector3f(textSize.getX() + width, textSize.getY() + height, textureLoc));
+        int textOffset = skin.getTextureOffset(terrain, blockLoc, face);
+        textureCoords.add(new Vector3f(0, 0, textOffset));
+        textureCoords.add(new Vector3f(width, 0, textOffset));
+        textureCoords.add(new Vector3f(0, height, textOffset));
+        textureCoords.add(new Vector3f(width, height, textOffset));
     }
 }
