@@ -1,3 +1,36 @@
+/**
+ * 
+ * Copyright (c) 2014, Nicholas Minkler
+ * 
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, 
+ *      are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice, 
+ *      this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice, 
+ *      this list of conditions and the following disclaimer in the documentation 
+ *      and/or other materials provided with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its contributors 
+ *      may be used to endorse or promote products derived from this software 
+ *      without specific prior written permission.
+ *
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" 
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED 
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. 
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, 
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, 
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF 
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE 
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED 
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * 
+ */
 package com.jme3.cubed.render;
 
 import com.jme3.cubed.BlockSkin;
@@ -10,10 +43,6 @@ import com.jme3.scene.VertexBuffer;
 import com.jme3.util.BufferUtils;
 import java.util.ArrayList;
 
-/**
- *
- * @author Nicholas Minkler <sleaker@gmail.com>
- */
 public abstract class VoxelMesher {
     public abstract Mesh generateMesh(ChunkTerrain terrain);
     
@@ -56,7 +85,7 @@ public abstract class VoxelMesher {
      */
     protected void writeQuad(ArrayList<Vector3f> verts, ArrayList<Integer> indices, ArrayList<Float> normals,
             Vector3f bottomLeft, Vector3f topLeft, Vector3f topRight, Vector3f bottomRight, Face face) {
-        //System.out.println("BL: " + bottomLeft + " BR: " + bottomRight + " TL: " + topLeft + " TR: " + topRight);
+
         // Get current vertex count, and add indices to the index list
         int vertCount = verts.size();
         indices.add(vertCount + 2);
@@ -73,11 +102,19 @@ public abstract class VoxelMesher {
         verts.add(bottomLeft);
         verts.add(topLeft);
         verts.add(topRight);
-        verts.add(bottomRight);
-        
-        
+        verts.add(bottomRight);    
     }
     
+    /**
+     * Write the texture coordinates t othe coordinate list takes into account the texture offset, then calculates what the 4 corners of the u,v should be.
+     * @param textureCoords
+     * @param terrain
+     * @param blockLoc
+     * @param face
+     * @param width
+     * @param height
+     * @param skin 
+     */
     protected void writeTextureCoords(ArrayList<Vector3f> textureCoords, ChunkTerrain terrain, Vector3i blockLoc, Face face, int width, int height, BlockSkin skin) {
         int textOffset = skin.getTextureOffset(terrain, blockLoc, face);
         textureCoords.add(new Vector3f(0, 0, textOffset));

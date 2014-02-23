@@ -2,7 +2,6 @@ package com.jme3.cubed.render;
 
 import com.jme3.cubed.ChunkTerrain;
 import com.jme3.cubed.math.Vector3i;
-import com.jme3.math.Vector2f;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;
 import java.util.ArrayList;
