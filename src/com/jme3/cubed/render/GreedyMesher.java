@@ -105,7 +105,7 @@ public class GreedyMesher extends VoxelMesher {
                                 switch (face) {
                                     case TOP:
                                         writeQuad(verts, indices, normals, vec1, vec3, vec0, vec2, face);
-                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, w, h, MaterialManager.getInstance().getType(mask[n]).getSkin());
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, h, w, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                     case BOTTOM:
                                         writeQuad(verts, indices, normals, vec3, vec1, vec2, vec0, face);
