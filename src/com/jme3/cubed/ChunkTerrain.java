@@ -68,7 +68,11 @@ public class ChunkTerrain extends Node {
                 this.attachChild(meshData);
                 meshData.setMaterial(chunkControl.getMaterial());
             }
+            long end, start; 
+            start = System.nanoTime();
             Mesh mesh = chunkControl.getMesher().generateMesh(this);
+            end = System.nanoTime();
+            System.out.println("Meshed chunk: " + location.toString() + " in: " + (end - start) / 1000000f + " milliseconds");
             if (mesh != null) {
                 meshData.setMesh(mesh);
             } else {
