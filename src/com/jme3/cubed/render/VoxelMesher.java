@@ -2,9 +2,7 @@ package com.jme3.cubed.render;
 
 import com.jme3.cubed.BlockSkin;
 import com.jme3.cubed.ChunkTerrain;
-import com.jme3.cubed.ChunkTerrainControl;
 import com.jme3.cubed.Face;
-import com.jme3.cubed.math.Vector2i;
 import com.jme3.cubed.math.Vector3i;
 import com.jme3.math.Vector3f;
 import com.jme3.scene.Mesh;

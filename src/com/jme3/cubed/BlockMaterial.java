@@ -23,6 +23,8 @@ public class BlockMaterial extends Material {
         }
         TextureArray textArray = new TextureArray(images);
         textArray.setWrap(Texture.WrapMode.Repeat);
+        textArray.setMagFilter(Texture.MagFilter.Nearest);
+        textArray.setMinFilter(Texture.MinFilter.NearestNearestMipMap);
         setTexture("ColorMap", textArray);
         getAdditionalRenderState().setBlendMode(BlendMode.Alpha);
         textSize = new Vector2i(textArray.getImage().getWidth(), textArray.getImage().getHeight());

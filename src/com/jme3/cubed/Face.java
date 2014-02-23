@@ -29,7 +29,7 @@ public enum Face {
     public Vector3i getOffsetVector() {
         return offset;
     }
-    
+
     public Vector3i getNeighbor(Vector3i point) {
         return point.add(this.offset);
     }

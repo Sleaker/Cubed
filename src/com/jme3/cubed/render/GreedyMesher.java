@@ -101,29 +101,35 @@ public class GreedyMesher extends VoxelMesher {
                                 Vector3f vec3 = new Vector3f(r + du[0] + dv[0], s + du[1] + dv[1], t + du[2] + dv[2]);
                                 
                                 // Each face has a specific order of vertices otherwise the textures rotate incorrectly
+                                // width/height are flipped when dealing with left/right/bottom face due to how rotation of dimensions works, and what order the greedy mesher merges them
                                 switch (face) {
                                     case TOP:
                                         writeQuad(verts, indices, normals, vec1, vec3, vec0, vec2, face);
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, w, h, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                     case BOTTOM:
                                         writeQuad(verts, indices, normals, vec3, vec1, vec2, vec0, face);
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, h, w, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                     case LEFT:
                                         writeQuad(verts, indices, normals, vec0, vec2, vec1, vec3, face);
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, h, w, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                     case RIGHT:
                                         //TODO: figure out why right face overwrites transparency
                                         writeQuad(verts, indices, normals, vec2, vec0, vec3, vec1, face);
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, h, w, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                     case FRONT:
                                         writeQuad(verts, indices, normals, vec0, vec1, vec2, vec3, face);
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, w, h, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                     case BACK:
                                         writeQuad(verts, indices, normals, vec1, vec0, vec3, vec2, face);
+                                        writeTextureCoords(textCoords, terrain, tmpI.set(x[0], x[1], x[2]), face, w, h, MaterialManager.getInstance().getType(mask[n]).getSkin());
                                         break;
                                 }
-                                // Write the texture coords
-                                this.writeTextureCoords(textCoords, terrain, tmpI, face, w, h, MaterialManager.getInstance().getType(mask[n]).getSkin());
+                                
                                 // Clear the mask
                                 for (l = 0; l < h; ++l) {
                                     for (k = 0; k < w; ++k) {

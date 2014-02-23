@@ -10,17 +10,13 @@ import com.jme3.cubed.ChunkTerrain;
 import com.jme3.cubed.ChunkTerrainControl;
 import com.jme3.cubed.Face;
 import com.jme3.cubed.MaterialManager;
-import com.jme3.cubed.math.Vector2i;
 import com.jme3.cubed.math.Vector3i;
 import com.jme3.cubed.render.GreedyMesher;
-import com.jme3.cubed.render.MarchingCubesMesher;
 import com.jme3.cubed.render.NaiveMesher;
 import com.jme3.cubed.render.VoxelMesher;
-import com.jme3.cubed.test.blocks.Block_Brick;
 import com.jme3.cubed.test.blocks.Block_Dirt;
 import com.jme3.cubed.test.blocks.Block_Grass;
 import com.jme3.cubed.test.blocks.Block_Stone;
-import com.jme3.cubed.test.blocks.Block_Water;
 import com.jme3.input.KeyInput;
 import com.jme3.input.controls.ActionListener;
 import com.jme3.input.controls.KeyTrigger;
@@ -49,7 +45,7 @@ public class CubedTest extends SimpleApplication {
     private BlockMaterial bm;
     private boolean wireframe = false;
     ChunkTerrainControl ctc;
-    ArrayList<VoxelMesher> meshers = new ArrayList<>(Arrays.asList(new NaiveMesher(), new GreedyMesher(), new MarchingCubesMesher()));
+    ArrayList<VoxelMesher> meshers = new ArrayList<>(Arrays.asList(new NaiveMesher(), new GreedyMesher()));
     private int currentMesh = 0;
 
     public static void main(String[] args) {
